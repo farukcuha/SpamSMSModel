@@ -41,7 +41,6 @@ fun ThreadsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     
-    // Delete confirmation dialog
     if (uiState.showDeleteConfirmation) {
         DeleteConfirmationDialog(
             selectedCount = uiState.selectedThreadIds.size,
@@ -53,7 +52,6 @@ fun ThreadsScreen(
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        // Top App Bar or Selection Action Bar
         Surface(
             shadowElevation = 8.dp
         ) {
@@ -81,7 +79,6 @@ fun ThreadsScreen(
                         )
                     )
                     
-                    // Tab Row (only show if not in selection mode)
                     TabRow(
                         selectedTabIndex = uiState.currentFilter.ordinal,
                         modifier = Modifier.fillMaxWidth(),
@@ -256,7 +253,6 @@ private fun SelectionActionBar(
             }
         },
         actions = {
-            // Select All/None
             IconButton(
                 onClick = {
                     if (selectedCount == totalCount) {
@@ -272,7 +268,6 @@ private fun SelectionActionBar(
                 )
             }
             
-            // Delete
             IconButton(
                 onClick = onDelete,
                 enabled = selectedCount > 0
@@ -324,7 +319,6 @@ private fun ThreadItem(
                 .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Selection checkbox
             if (isSelectionMode) {
                 Checkbox(
                     checked = isSelected,
@@ -333,7 +327,6 @@ private fun ThreadItem(
                 )
             }
             
-            // Avatar/Icon
             Box(
                 modifier = Modifier
                     .size(40.dp)
@@ -360,7 +353,6 @@ private fun ThreadItem(
             
             Spacer(modifier = Modifier.width(12.dp))
             
-            // Content
             Column(
                 modifier = Modifier.weight(1f)
             ) {
@@ -369,7 +361,6 @@ private fun ThreadItem(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.Top
                 ) {
-                    // Sender/Receiver number
                     Text(
                         text = thread.recipient_address,
                         style = MaterialTheme.typography.bodyLarge,
@@ -382,7 +373,6 @@ private fun ThreadItem(
                     
                     Spacer(modifier = Modifier.width(8.dp))
                     
-                    // Date
                     Text(
                         text = formatDate(thread.last_message_date),
                         style = MaterialTheme.typography.bodySmall,
@@ -402,7 +392,6 @@ private fun ThreadItem(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Last message preview
                     Text(
                         text = thread.last_message_body,
                         style = MaterialTheme.typography.bodyMedium,
@@ -414,12 +403,10 @@ private fun ThreadItem(
                     
                     Spacer(modifier = Modifier.width(8.dp))
                     
-                    // Badges
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
-                        // Normal unread messages badge
                         if (thread.unread_normal_count > 0) {
                             Surface(
                                 shape = CircleShape,
@@ -439,8 +426,6 @@ private fun ThreadItem(
                                 }
                             }
                         }
-                        
-                        // Spam unread messages badge
                         if (thread.unread_spam_count > 0) {
                             Surface(
                                 shape = CircleShape,
@@ -516,14 +501,14 @@ private fun formatDate(timestamp: Long): String {
     val messageCalendar = Calendar.getInstance().apply { timeInMillis = timestamp }
     
     return when {
-        diff < 60_000 -> "Now" // Less than 1 minute
-        diff < 3600_000 -> "${diff / 60_000}m" // Less than 1 hour
-        diff < 86400_000 -> "${diff / 3600_000}h" // Less than 24 hours
+        diff < 60_000 -> "Now"
+        diff < 3600_000 -> "${diff / 60_000}m"
+        diff < 86400_000 -> "${diff / 3600_000}h"
         calendar.get(Calendar.DAY_OF_YEAR) == messageCalendar.get(Calendar.DAY_OF_YEAR) -> {
             SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(timestamp))
         }
         calendar.get(Calendar.DAY_OF_YEAR) - 1 == messageCalendar.get(Calendar.DAY_OF_YEAR) -> "Yesterday"
-        diff < 604800_000 -> SimpleDateFormat("EEEE", Locale.getDefault()).format(Date(timestamp)) // Less than 1 week
+        diff < 604800_000 -> SimpleDateFormat("EEEE", Locale.getDefault()).format(Date(timestamp))
         else -> SimpleDateFormat("dd/MM", Locale.getDefault()).format(Date(timestamp))
     }
 } 

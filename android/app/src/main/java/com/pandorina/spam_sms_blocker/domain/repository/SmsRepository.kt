@@ -13,7 +13,6 @@ interface SmsRepository {
     suspend fun getMessagesWithNullSpamScoreLimit(limit: Int): List<MessageEntity>
     suspend fun getMessagesWithNullSpamScoreCount(): Int
     
-    // Thread operations
     fun getAllThreads(): Flow<List<MessageDao.ThreadData>>
     fun getNormalThreads(): Flow<List<MessageDao.ThreadData>>
     fun getSpamThreads(): Flow<List<MessageDao.ThreadData>>
@@ -23,7 +22,6 @@ interface SmsRepository {
     suspend fun deleteThread(threadId: Long)
     suspend fun deleteMultipleThreads(threadIds: List<Long>)
     
-    // Thread counts for tabs
     fun getAllThreadsCount(): Flow<Int>
     fun getNormalThreadsCount(): Flow<Int>
     fun getSpamThreadsCount(): Flow<Int>

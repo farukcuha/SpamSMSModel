@@ -34,7 +34,6 @@ class ThreadsViewModel @Inject constructor(
         val allThreadsCount: Int = 0,
         val normalThreadsCount: Int = 0,
         val spamThreadsCount: Int = 0,
-        // Selection state
         val isSelectionMode: Boolean = false,
         val selectedThreadIds: Set<Long> = emptySet(),
         val isDeleting: Boolean = false,
@@ -44,7 +43,6 @@ class ThreadsViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ThreadsUiState())
     val uiState: StateFlow<ThreadsUiState> = _uiState.asStateFlow()
 
-    // Shared flow for all threads - cached and shared across multiple collectors
     private val allThreadsFlow = smsRepository.getAllThreads()
         .distinctUntilChanged()
         .shareIn(
@@ -53,13 +51,12 @@ class ThreadsViewModel @Inject constructor(
             replay = 1
         )
 
-    // Derived flows from the main flow for better performance
     private val threadCountsFlow = allThreadsFlow
         .map { threads ->
             Triple(
-                threads.size, // all count
-                threads.count { !it.has_spam }, // normal count  
-                threads.count { it.has_spam } // spam count
+                threads.size,
+                threads.count { !it.has_spam },
+                threads.count { it.has_spam }
             )
         }
         .distinctUntilChanged()
@@ -72,12 +69,10 @@ class ThreadsViewModel @Inject constructor(
     private fun observeThreadsReactively() {
         viewModelScope.launch {
             try {
-                // Combine cached all threads with current filter for client-side filtering
                 combine(
                     allThreadsFlow,
                     _uiState.map { it.currentFilter }.distinctUntilChanged()
                 ) { allThreads, currentFilter ->
-                    // Client-side filtering - much more efficient
                     val filteredThreads = when (currentFilter) {
                         ThreadFilter.ALL -> allThreads
                         ThreadFilter.NORMAL -> allThreads.filter { !it.has_spam }
@@ -118,7 +113,6 @@ class ThreadsViewModel @Inject constructor(
     private fun observeThreadCounts() {
         viewModelScope.launch {
             threadCountsFlow
-                .catch { /* Handle error silently */ }
                 .collect { (allCount, normalCount, spamCount) ->
                     _uiState.update {
                         it.copy(
@@ -132,16 +126,9 @@ class ThreadsViewModel @Inject constructor(
     }
 
     fun setFilter(filter: ThreadFilter) {
-        // Only update the filter state - reactive flows will handle the rest
         _uiState.update { it.copy(currentFilter = filter) }
     }
-
-    fun refreshThreads() {
-        // Data is already reactive - this could trigger a refresh if needed
-        // For pull-to-refresh functionality
-    }
     
-    // Selection methods
     fun startSelectionMode(threadId: Long) {
         _uiState.update {
             it.copy(
@@ -168,7 +155,6 @@ class ThreadsViewModel @Inject constructor(
                 currentState.selectedThreadIds + threadId
             }
             
-            // Exit selection mode if no threads selected
             if (newSelection.isEmpty()) {
                 currentState.copy(
                     isSelectionMode = false,
@@ -196,7 +182,6 @@ class ThreadsViewModel @Inject constructor(
         }
     }
     
-    // Delete methods
     fun showDeleteConfirmation() {
         _uiState.update { it.copy(showDeleteConfirmation = true) }
     }
@@ -231,9 +216,7 @@ class ThreadsViewModel @Inject constructor(
                         selectedThreadIds = emptySet()
                     )
                 }
-                
-                // Reactive flows will automatically update
-                
+
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(

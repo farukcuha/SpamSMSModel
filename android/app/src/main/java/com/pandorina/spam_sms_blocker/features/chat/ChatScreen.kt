@@ -40,7 +40,6 @@ fun ChatScreen(
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        // Top App Bar
         TopAppBar(
             title = {
                 Text(
@@ -130,7 +129,6 @@ fun ChatScreen(
             }
             
             else -> {
-                // Chat Messages
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
@@ -160,7 +158,6 @@ private fun MessageItem(
             .padding(vertical = 2.dp),
         horizontalAlignment = if (isOwnMessage) Alignment.End else Alignment.Start
     ) {
-        // Message bubble
         Box(
             modifier = Modifier
                 .fillMaxWidth(0.75f)
@@ -186,7 +183,6 @@ private fun MessageItem(
                 Column(
                     modifier = Modifier.padding(12.dp)
                 ) {
-                    // Message text
                     Text(
                         text = message.body,
                         style = MaterialTheme.typography.bodyMedium,
@@ -196,10 +192,7 @@ private fun MessageItem(
                             MaterialTheme.colorScheme.onSurfaceVariant
                         }
                     )
-                    
                     Spacer(modifier = Modifier.height(4.dp))
-                    
-                    // Message info (time, read status)
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.End,
@@ -214,8 +207,6 @@ private fun MessageItem(
                                 MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                             }
                         )
-                        
-                        // Show spam indicator if message has spam score
                         if (message.spamScore != null && message.spamScore > 0.7f) {
                             Spacer(modifier = Modifier.width(4.dp))
                             Surface(
@@ -246,15 +237,15 @@ private fun formatMessageTime(timestamp: Long): String {
     val messageCalendar = Calendar.getInstance().apply { timeInMillis = timestamp }
     
     return when {
-        diff < 60_000 -> "Now" // Less than 1 minute
-        diff < 3600_000 -> "${diff / 60_000}m ago" // Less than 1 hour
+        diff < 60_000 -> "Now"
+        diff < 3600_000 -> "${diff / 60_000}m ago"
         calendar.get(Calendar.DAY_OF_YEAR) == messageCalendar.get(Calendar.DAY_OF_YEAR) -> {
             SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(timestamp))
         }
         calendar.get(Calendar.DAY_OF_YEAR) - 1 == messageCalendar.get(Calendar.DAY_OF_YEAR) -> {
             "Yesterday " + SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(timestamp))
         }
-        diff < 604800_000 -> { // Less than 1 week
+        diff < 604800_000 -> {
             SimpleDateFormat("EEE HH:mm", Locale.getDefault()).format(Date(timestamp))
         }
         else -> SimpleDateFormat("dd/MM HH:mm", Locale.getDefault()).format(Date(timestamp))

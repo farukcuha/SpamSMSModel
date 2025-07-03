@@ -77,7 +77,6 @@ class SmsRepositoryImpl @Inject constructor(
         messageDao.deleteMultipleThreads(threadIds)
     }
     
-    // Thread counts for tabs
     override fun getAllThreadsCount(): Flow<Int> {
         return messageDao.getAllThreadsCount()
     }

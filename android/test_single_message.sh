@@ -1,1 +1,1 @@
-adb emu sms send "+905102081661" "merhaba"
+adb emu sms send "+905102081661" """Bilgilendirme: Kişisel verilerin korunmasına ilişkin aydınlatma metnimiz ve kullanıcı sözleşmemiz güncellendi. Yeni metinlere ulaşmak için: https://hopi.com.tr/information/aydinlatma-metni, https://hopi.com.tr/information/hopi-kullanicilari-icin HOPİ (BNR Teknoloji A.Ş.) Mersis no: 0335041279900014 Bilgi için: info@hopi.com.tr B016"""

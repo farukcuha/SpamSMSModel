@@ -31,7 +31,6 @@ interface MessageDao {
     @Query("SELECT COUNT(*) FROM messages WHERE spam_score IS NULL")
     suspend fun getMessagesWithNullSpamScoreCount(): Int
     
-    // Thread queries
     @Query("""
         WITH latest_messages AS (
             SELECT *,
@@ -43,20 +42,15 @@ interface MessageDao {
                 thread_id,
                 COUNT(*) as message_count,
                 SUM(CASE WHEN read = 0 THEN 1 ELSE 0 END) as unread_count,
-                SUM(CASE WHEN read = 0 AND COALESCE(spam_score, 0) <= 0.7 THEN 1 ELSE 0 END) as unread_normal_count,
-                SUM(CASE WHEN read = 0 AND COALESCE(spam_score, 0) > 0.7 THEN 1 ELSE 0 END) as unread_spam_count,
-                -- Akıllı spam tespiti: Önce okunmamış mesajlara bak
+                SUM(CASE WHEN read = 0 AND COALESCE(spam_score, 0) <= 0.5 THEN 1 ELSE 0 END) as unread_normal_count,
+                SUM(CASE WHEN read = 0 AND COALESCE(spam_score, 0) > 0.5 THEN 1 ELSE 0 END) as unread_spam_count,
                 CASE 
-                    -- Eğer okunmamış mesajlar varsa
                     WHEN SUM(CASE WHEN read = 0 THEN 1 ELSE 0 END) > 0 THEN
                         CASE 
-                            -- Okunmamış ve spam olmayan mesaj varsa -> Normal thread
-                            WHEN SUM(CASE WHEN read = 0 AND COALESCE(spam_score, 0) <= 0.7 THEN 1 ELSE 0 END) > 0 THEN 0
-                            -- Sadece okunmamış spam mesajlar varsa -> Spam thread  
+                            WHEN SUM(CASE WHEN read = 0 AND COALESCE(spam_score, 0) <= 0.5 THEN 1 ELSE 0 END) > 0 THEN 0
                             ELSE 1
                         END
-                    -- Okunmamış mesaj yoksa, en son mesaja bak
-                    ELSE CASE WHEN MAX(COALESCE(spam_score, 0)) > 0.7 THEN 1 ELSE 0 END
+                    ELSE CASE WHEN MAX(COALESCE(spam_score, 0)) > 0.5 THEN 1 ELSE 0 END
                 END as has_spam
             FROM messages 
             GROUP BY thread_id
@@ -78,7 +72,6 @@ interface MessageDao {
     """)
     fun getAllThreads(): Flow<List<ThreadData>>
     
-    // Normal threads (not spam)
     @Query("""
         WITH latest_messages AS (
             SELECT *,
@@ -90,19 +83,14 @@ interface MessageDao {
                 thread_id,
                 COUNT(*) as message_count,
                 SUM(CASE WHEN read = 0 THEN 1 ELSE 0 END) as unread_count,
-                SUM(CASE WHEN read = 0 AND COALESCE(spam_score, 0) <= 0.7 THEN 1 ELSE 0 END) as unread_normal_count,
-                SUM(CASE WHEN read = 0 AND COALESCE(spam_score, 0) > 0.7 THEN 1 ELSE 0 END) as unread_spam_count,
-                -- Akıllı spam tespiti: Önce okunmamış mesajlara bak
+                SUM(CASE WHEN read = 0 AND COALESCE(spam_score, 0) <= 0.5 THEN 1 ELSE 0 END) as unread_normal_count,
+                SUM(CASE WHEN read = 0 AND COALESCE(spam_score, 0) > 0.5 THEN 1 ELSE 0 END) as unread_spam_count,
                 CASE 
-                    -- Eğer okunmamış mesajlar varsa
                     WHEN SUM(CASE WHEN read = 0 THEN 1 ELSE 0 END) > 0 THEN
                         CASE 
-                            -- Okunmamış ve spam olmayan mesaj varsa -> Normal thread
                             WHEN SUM(CASE WHEN read = 0 AND COALESCE(spam_score, 0) <= 0.7 THEN 1 ELSE 0 END) > 0 THEN 0
-                            -- Sadece okunmamış spam mesajlar varsa -> Spam thread  
                             ELSE 1
                         END
-                    -- Okunmamış mesaj yoksa, en son mesaja bak
                     ELSE CASE WHEN MAX(COALESCE(spam_score, 0)) > 0.7 THEN 1 ELSE 0 END
                 END as has_spam
             FROM messages 
@@ -126,7 +114,6 @@ interface MessageDao {
     """)
     fun getNormalThreads(): Flow<List<ThreadData>>
     
-    // Spam threads
     @Query("""
         WITH latest_messages AS (
             SELECT *,
@@ -138,20 +125,15 @@ interface MessageDao {
                 thread_id,
                 COUNT(*) as message_count,
                 SUM(CASE WHEN read = 0 THEN 1 ELSE 0 END) as unread_count,
-                SUM(CASE WHEN read = 0 AND COALESCE(spam_score, 0) <= 0.7 THEN 1 ELSE 0 END) as unread_normal_count,
-                SUM(CASE WHEN read = 0 AND COALESCE(spam_score, 0) > 0.7 THEN 1 ELSE 0 END) as unread_spam_count,
-                -- Akıllı spam tespiti: Önce okunmamış mesajlara bak
+                SUM(CASE WHEN read = 0 AND COALESCE(spam_score, 0) <= 0.5 THEN 1 ELSE 0 END) as unread_normal_count,
+                SUM(CASE WHEN read = 0 AND COALESCE(spam_score, 0) > 0.5 THEN 1 ELSE 0 END) as unread_spam_count,
                 CASE 
-                    -- Eğer okunmamış mesajlar varsa
                     WHEN SUM(CASE WHEN read = 0 THEN 1 ELSE 0 END) > 0 THEN
                         CASE 
-                            -- Okunmamış ve spam olmayan mesaj varsa -> Normal thread
-                            WHEN SUM(CASE WHEN read = 0 AND COALESCE(spam_score, 0) <= 0.7 THEN 1 ELSE 0 END) > 0 THEN 0
-                            -- Sadece okunmamış spam mesajlar varsa -> Spam thread  
+                            WHEN SUM(CASE WHEN read = 0 AND COALESCE(spam_score, 0) <= 0.5 THEN 1 ELSE 0 END) > 0 THEN 0
                             ELSE 1
                         END
-                    -- Okunmamış mesaj yoksa, en son mesaja bak
-                    ELSE CASE WHEN MAX(COALESCE(spam_score, 0)) > 0.7 THEN 1 ELSE 0 END
+                    ELSE CASE WHEN MAX(COALESCE(spam_score, 0)) > 0.5 THEN 1 ELSE 0 END
                 END as has_spam
             FROM messages 
             GROUP BY thread_id
@@ -174,7 +156,6 @@ interface MessageDao {
     """)
     fun getSpamThreads(): Flow<List<ThreadData>>
     
-    // Thread counts for tabs
     @Query("""
         SELECT COUNT(DISTINCT thread_id) 
         FROM messages
@@ -190,16 +171,12 @@ interface MessageDao {
             GROUP BY thread_id 
             HAVING 
                 CASE 
-                    -- Eğer okunmamış mesajlar varsa
                     WHEN SUM(CASE WHEN read = 0 THEN 1 ELSE 0 END) > 0 THEN
                         CASE 
-                            -- Okunmamış ve spam olmayan mesaj varsa -> Normal thread
-                            WHEN SUM(CASE WHEN read = 0 AND COALESCE(spam_score, 0) <= 0.7 THEN 1 ELSE 0 END) > 0 THEN 0
-                            -- Sadece okunmamış spam mesajlar varsa -> Spam thread  
+                            WHEN SUM(CASE WHEN read = 0 AND COALESCE(spam_score, 0) <= 0.5 THEN 1 ELSE 0 END) > 0 THEN 0
                             ELSE 1
                         END
-                    -- Okunmamış mesaj yoksa, en son mesaja bak
-                    ELSE CASE WHEN MAX(COALESCE(spam_score, 0)) > 0.7 THEN 1 ELSE 0 END
+                    ELSE CASE WHEN MAX(COALESCE(spam_score, 0)) > 0.5 THEN 1 ELSE 0 END
                 END = 0
         )
     """)
@@ -214,16 +191,12 @@ interface MessageDao {
             GROUP BY thread_id 
             HAVING 
                 CASE 
-                    -- Eğer okunmamış mesajlar varsa
                     WHEN SUM(CASE WHEN read = 0 THEN 1 ELSE 0 END) > 0 THEN
                         CASE 
-                            -- Okunmamış ve spam olmayan mesaj varsa -> Normal thread
-                            WHEN SUM(CASE WHEN read = 0 AND COALESCE(spam_score, 0) <= 0.7 THEN 1 ELSE 0 END) > 0 THEN 0
-                            -- Sadece okunmamış spam mesajlar varsa -> Spam thread  
+                            WHEN SUM(CASE WHEN read = 0 AND COALESCE(spam_score, 0) <= 0.5 THEN 1 ELSE 0 END) > 0 THEN 0
                             ELSE 1
                         END
-                    -- Okunmamış mesaj yoksa, en son mesaja bak
-                    ELSE CASE WHEN MAX(COALESCE(spam_score, 0)) > 0.7 THEN 1 ELSE 0 END
+                    ELSE CASE WHEN MAX(COALESCE(spam_score, 0)) > 0.5 THEN 1 ELSE 0 END
                 END = 1
         )
     """)

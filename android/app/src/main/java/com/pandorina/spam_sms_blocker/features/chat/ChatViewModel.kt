@@ -59,14 +59,9 @@ class ChatViewModel @Inject constructor(
                                 recipientAddress = recipientAddress
                             )
                         }
-                        
-                        // Mark all messages in this thread as read
                         try {
                             smsRepository.markThreadMessagesAsRead(threadId)
-                        } catch (e: Exception) {
-                            // If marking as read fails, don't break the flow
-                            // Just continue with loading messages
-                        }
+                        } catch (_: Exception) { }
                     }
             } catch (e: Exception) {
                 _uiState.update {
@@ -76,12 +71,6 @@ class ChatViewModel @Inject constructor(
                     )
                 }
             }
-        }
-    }
-
-    fun refreshMessages() {
-        _uiState.value.currentThreadId?.let { threadId ->
-            loadMessages(threadId)
         }
     }
 } 

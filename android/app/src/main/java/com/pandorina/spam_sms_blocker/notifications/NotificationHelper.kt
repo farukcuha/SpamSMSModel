@@ -64,8 +64,4 @@ class NotificationHelper @Inject constructor(
             e.printStackTrace()
         }
     }
-
-    fun cancelSmsNotification(messageId: Long) {
-        NotificationManagerCompat.from(context).cancel(messageId.toInt())
-    }
 } 
