@@ -1,0 +1,1 @@
+adb emu sms send "+905102081661" "merhaba"
