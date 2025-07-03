@@ -92,7 +92,7 @@ def display_model_metrics(history, y_test, y_pred):
     print(f"Spam      {cm[1][0]:6d}  {cm[1][1]:4d}")
 
     accuracy = accuracy_score(y_test, y_pred)
-    print(f"\nGenel Doğruluk (Accuracy): {accuracy:.4f}")
+    print(f"\nAccuracy: {accuracy:.4f}")
 
 if __name__ == '__main__':
     main()
