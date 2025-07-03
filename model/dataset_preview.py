@@ -16,12 +16,12 @@ def create_visualizations(df):
     axes[1].hist(df['message_length'], bins=50, alpha=0.7, color='skyblue')
     axes[1].set_title('Mesaj Uzunluğu Dağılımı')
     axes[1].set_xlabel('Karakter Sayısı')
-    axes[1].set_ylabel('Frekans')
+    axes[1].set_ylabel('')
     
     axes[2].hist(df['word_count'], bins=30, alpha=0.7, color='lightgreen')
     axes[2].set_title('Kelime Sayısı Dağılımı')
     axes[2].set_xlabel('Kelime Sayısı')
-    axes[2].set_ylabel('Frekans')
+    axes[2].set_ylabel('')
     
     plt.tight_layout()
     plt.savefig('../data/dataset_analysis.png', dpi=300, bbox_inches='tight')

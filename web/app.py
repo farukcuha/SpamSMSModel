@@ -65,4 +65,4 @@ def predict():
 
 if __name__ == '__main__':
     load_model_and_tokenizer()
-    app.run(debug=True, host='0.0.0.0', port=4000)
+    app.run(debug=True, host='0.0.0.0', port=4100)
