@@ -1,7 +1,7 @@
-The model works on locale so it's blazing fast.
+The model works on locale so it's fucking fast!
 
-It was for my bitirme project.
+It was for my bitirme project!
 
 Enjoy it!
 
-![model screenshot](https://i.hizliresim.com/kyus9l1.png)
+![model screenshot](https://i.ibb.co/9mqrMqfp/mobile-ss.png)
